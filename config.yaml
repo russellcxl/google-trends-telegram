@@ -1,0 +1,6 @@
+google_client:
+  default_params:
+    - ["geo", "SG"]
+    - ["hl", "en-GB"]
+    - ["tz", "480"]
+    - ["ns", "15"]

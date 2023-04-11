@@ -3,38 +3,43 @@ package api
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/russellcxl/google-trends/pkg/types"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
-	"github.com/russellcxl/google-trends/pkg/types"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 // https://trends.google.com/trends/api/dailytrends?hl=en-GB&tz=-480&geo=SG&hl=en-GB&ns=15
 
-func Run() {
+type GoogleClient struct {
+	client        *http.Client
+	defaultParams url.Values
+}
+
+func NewGoogleClient(defaultParams url.Values) *GoogleClient {
+	return &GoogleClient{
+		client:        http.DefaultClient,
+		defaultParams: defaultParams,
+	}
+}
+
+func (c *GoogleClient) GetDailyTrends() []string {
 	path := "https://trends.google.com/trends/api/dailytrends"
 	u, _ := url.Parse(path)
-	p := url.Values{}
-	p.Set("geo", "SG")
-	p.Set("hl", "en-GB")
-	p.Set("tz", "480")
-	p.Set("ns", "15")
-	u.RawQuery = p.Encode()
+	u.RawQuery = c.defaultParams.Encode()
 	r, err := http.NewRequestWithContext(context.Background(), http.MethodGet, u.String(), nil)
 	if err != nil {
 		panic(err)
 	}
 	r.Header.Add("Accept", "application/json")
-	client := http.DefaultClient
-	resp, err := client.Do(r)
+	resp, err := c.client.Do(r)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +51,10 @@ func Run() {
 	for _, v := range out.Default.Searches {
 		searches = append(searches, v.Searches...)
 	}
+	fmt.Printf("%+v", searches[0])
+	var output []string
 	for _, s := range searches {
-		fmt.Println(s.Title.Query)
+		output = append(output, s.Title.Query)
 	}
+	return output
 }
