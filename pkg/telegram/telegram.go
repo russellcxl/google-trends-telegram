@@ -1,7 +1,7 @@
 package telegram
 
 import (
-	"fmt"
+	"strings"
 	"log"
 	"os"
 
@@ -51,8 +51,15 @@ func Run(gClient *api.GoogleClient) {
 
 		// send message back to user
 		userID := update.Message.Chat.ID
-		resp := bot.getResp(update.Message.Text)
+		// b, _ := json.MarshalIndent(update, " ", " ")
+		// fmt.Println(string(b))
+		
+		var resp string
+		if update.Message.IsCommand() {
+			resp = bot.handleCmd(update.Message.Command(), update.Message.CommandArguments())
+		}
 		message := tgbotapi.NewMessage(userID, resp)
+		message.ParseMode = tgbotapi.ModeMarkdown
 		_, err := bot.Send(message)
 		if err != nil {
 			log.Printf("failed to send message back to user (%d): %v", userID, err)
@@ -60,15 +67,24 @@ func Run(gClient *api.GoogleClient) {
 	}
 }
 
-func (t teleBot) getResp(input string) string {
-	switch input {
-	case "/getdaily":
-		topics := t.gClient.GetDailyTrends()
-		var output string
-		for _, topic := range topics {
-			output += fmt.Sprintf("- %s\n", topic)
+func (t teleBot) handleCmd(cmd, args string) string {
+	switch cmd {
+	case "getdaily":
+		var _args []string
+		if args != "" {
+			_args = strings.Split(args, " ")			
 		}
-		return output
+		var opts *api.DailyOpts
+		if len(_args) > 1 {
+			return "Too many arguments for /getdaily. Should only contain 1: {COUNTRY}"
+		}
+		if len(_args) > 0 {
+			country := _args[0]
+			opts = &api.DailyOpts {
+				Country: &country,
+			}
+		}
+		return t.gClient.GetDailyTrends(opts)
 	}
 	return "Whoops! You've entered an invalid command."
 }

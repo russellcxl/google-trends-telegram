@@ -1,5 +1,10 @@
 package types
 
+const (
+	BaseURL              = "https://trends.google.com/trends/api"
+	DailyTrendsURLPrefix = "/dailytrends"
+)
+
 type Daily struct {
 	Default TrendingSearchesDays `json:"default"`
 }
@@ -9,14 +14,14 @@ type TrendingSearchesDays struct {
 }
 
 type TrendingSearchDays struct {
-	FormattedDate string            `json:"formattedDate"`
+	FormattedDate string           `json:"formattedDate"`
 	Searches      []TrendingSearch `json:"trendingSearches"`
 }
 
 type TrendingSearch struct {
-	Title            SearchTitle     `json:"title"`
+	Title            SearchTitle      `json:"title"`
 	FormattedTraffic string           `json:"formattedTraffic"`
-	Image            SearchImage     `json:"image"`
+	Image            SearchImage      `json:"image"`
 	Articles         []*SearchArticle `json:"articles"`
 }
 
@@ -37,4 +42,13 @@ type SearchArticle struct {
 	Image   *SearchImage `json:"image"`
 	URL     string       `json:"url"`
 	Snippet string       `json:"snippet"`
+}
+
+type CountryCodes struct {
+	Children []Child `json:"children"`
+}
+
+type Child struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
 }

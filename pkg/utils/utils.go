@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"os"
 	"log"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
@@ -15,12 +15,17 @@ type Config struct {
 
 type GoogleClient struct {
 	DefaultParams [][]string `yaml:"default_params"`
+	Daily         Daily      `yaml:"daily"`
+}
+
+type Daily struct {
+	ListCount int `yaml:"list_count"`
 }
 
 func GetConfig(path string) *Config {
 	if config != nil {
 		return config
-	} 
+	}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatalf("failed to read config file: %v", err)
