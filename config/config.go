@@ -1,4 +1,4 @@
-package utils
+package config
 
 import (
 	"log"
@@ -22,11 +22,15 @@ type Daily struct {
 	ListCount int `yaml:"list_count"`
 }
 
-func GetConfig(path string) *Config {
+func GetConfig() *Config {
 	if config != nil {
 		return config
 	}
-	data, err := os.ReadFile(path)
+	configPath, found := os.LookupEnv("CONFIG_PATH")
+	if !found {
+		log.Fatalf("failed to find config path in env")
+	}
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("failed to read config file: %v", err)
 	}

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"syscall"
+	"os/signal"
+	"os"
 	"log"
-
-	"github.com/russellcxl/google-trends/pkg/utils"
 
 	"github.com/russellcxl/google-trends/pkg/api"
 
@@ -16,12 +17,19 @@ func main() {
 	// load env variables
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("failed to load .env: %v", err)
+		log.Printf("failed to load local .env file: %v", err)
 	}
 
 	// initialize google trends client with default params
-	config := utils.GetConfig("config.yaml")
-	gClient := api.NewGoogleClient(*config)
+	gClient := api.NewGoogleClient()
+
+	// terminate gracefully
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		os.Exit(0)
+	}()
 
 	// allows program to start receiving messages from the telegram bot
 	telegram.Run(gClient)

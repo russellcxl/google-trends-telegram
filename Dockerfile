@@ -1,20 +1,25 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.19
+FROM golang:1.19-buster as builder
 
-# Set destination for COPY
-WORKDIR /go/src/app
+WORKDIR /app
 
-# Download Go modules
-COPY go.mod go.sum ./
+COPY go.* ./
+
 RUN go mod download
 
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY . .
+COPY . ./
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /trends cmd/main.go
+RUN go build -o trends cmd/main.go
 
-# Run
-CMD ["/trends"]
+FROM debian:buster-slim
+RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/trends /app/trends
+
+COPY /config/config.yaml ./app
+ENV CONFIG_PATH="./app/config.yaml"
+
+CMD ["/app/trends"]

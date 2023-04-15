@@ -1,16 +1,17 @@
 package api
 
 import (
-	"log"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
-	"github.com/russellcxl/google-trends/pkg/utils"
+	"github.com/russellcxl/google-trends/config"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/russellcxl/google-trends/pkg/types"
@@ -21,7 +22,7 @@ import (
 type GoogleClient struct {
 	client            *http.Client
 	params            url.Values
-	config            utils.Config
+	config            *config.Config
 	validCountryCodes map[string]bool
 }
 
@@ -29,32 +30,55 @@ type DailyOpts struct {
 	Country *string
 }
 
-func NewGoogleClient(config utils.Config) *GoogleClient {
+func NewGoogleClient() *GoogleClient {
+	cfg := config.GetConfig()
 	defaultParams := url.Values{}
-	for _, val := range config.GoogleClient.DefaultParams {
+	for _, val := range cfg.GoogleClient.DefaultParams {
 		defaultParams.Set(val[0], val[1])
 	}
 	return &GoogleClient{
 		client:            http.DefaultClient,
 		params:            defaultParams,
-		config:            config,
+		config:            cfg,
 		validCountryCodes: getCountryCodes(),
 	}
 }
 
 func getCountryCodes() map[string]bool {
 	m := make(map[string]bool)
-	url := "https://assets.api-cdn.com/serpwow/serpwow_google_trends_geos.json"
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Fatalf("failed to get Google country codes: %v", err)
-	}
-	defer resp.Body.Close()
+	fileName := "./country_codes.json"
 	var data types.CountryCodes
-	err = json.NewDecoder(resp.Body).Decode(&data)
+	b, err := os.ReadFile(fileName)
 	if err != nil {
-		log.Fatalf("failed to decode Google country codes: %v", err)
+		// if not found locally, get from URL
+		log.Println("Country codes not found. Getting from URL")
+		url := "https://assets.api-cdn.com/serpwow/serpwow_google_trends_geos.json"
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatalf("failed to get Google country codes: %v", err)
+		}
+		defer resp.Body.Close()
+		err = json.NewDecoder(resp.Body).Decode(&data)
+		if err != nil {
+			log.Fatalf("failed to decode Google country codes: %v", err)
+		}
+
+		// and write to file
+		output, err := json.MarshalIndent(data, "", "  ")
+		if err != nil {
+			log.Fatalf("failed to marshal country codes: %v", err)
+		}
+		err = os.WriteFile("country_codes.json", output, 0644)
+		if err != nil {
+			log.Fatalf("failed to write country codes to json file: %v", err)
+		}
+	} else {
+		if err := json.Unmarshal(b, &data); err != nil {
+			log.Fatalf("failed to read country codes from json: %v", err)
+		}
 	}
+
+	// add to map and return
 	for _, c := range data.Children {
 		m[c.ID] = true
 	}

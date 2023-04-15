@@ -5,4 +5,4 @@ google_client:
     - ["tz", "480"]
     - ["ns", "15"]
   daily:
-    list_count: 7  
+    list_count: 7
