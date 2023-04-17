@@ -8,3 +8,13 @@ Convert https://trends.google.com/trends/trendingsearches/daily?geo=SG, into an 
 - Level 3: Clear documentation, structure, design at code and service design with UXD - Developer.
 - Level 4: Recommend 3 different development stacks, cloud computing services and their trade-offs. 
 - Level 5: Business Understanding and Opportunities. Ability to create monetization, cost reduction or cost avoidance strategies.
+
+## Running
+```
+docker build -t trends .
+
+docker run 
+-e TELEGRAM_TOKEN=XXX 
+-e ACCESS_TOKEN=XXX 
+-it trends
+```
