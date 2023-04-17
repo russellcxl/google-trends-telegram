@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/russellcxl/google-trends/pkg/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -120,11 +121,17 @@ func (c *GoogleClient) GetDailyTrends(opts *DailyOpts) string {
 
 	var searches []types.TrendingSearch
 	for _, v := range out.Default.Searches {
+		if !utils.IsToday(v.FormattedDate) {
+			break
+		}
 		searches = append(searches, v.Searches...)
 	}
 
 	var list string
 	listCount := c.config.GoogleClient.Daily.ListCount
+	if listCount > len(searches) {
+		listCount = len(searches)
+	}
 	for i := 0; i < listCount; i++ {
 		s := searches[i]
 		list += fmt.Sprintf("*%s*\n      _~%s searches_\n\n", s.Title.Query, s.FormattedTraffic)
