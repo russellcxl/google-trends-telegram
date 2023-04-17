@@ -52,3 +52,7 @@ type Child struct {
 	Name string `json:"name"`
 	ID   string `json:"id"`
 }
+
+type UserIDs struct {
+	UserIDs []int64 `json:"user_ids"`
+}

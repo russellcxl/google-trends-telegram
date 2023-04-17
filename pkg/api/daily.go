@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/russellcxl/google-trends/pkg/utils"
+	"path/filepath"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/russellcxl/google-trends/pkg/utils"
 
 	"github.com/russellcxl/google-trends/config"
 
@@ -47,11 +49,14 @@ func NewGoogleClient() *GoogleClient {
 
 func getCountryCodes() map[string]bool {
 	m := make(map[string]bool)
-	fileName := "./country_codes.json"
-	var data types.CountryCodes
+	fileName := filepath.Join(os.Getenv("DATA_PATH"), "country_codes.json")
 	b, err := os.ReadFile(fileName)
+	
+	// if not found locally, get from URL and save it
+	var data types.CountryCodes
 	if err != nil {
-		// if not found locally, get from URL
+
+		// get from URL
 		log.Println("Country codes not found. Getting from URL")
 		url := "https://assets.api-cdn.com/serpwow/serpwow_google_trends_geos.json"
 		resp, err := http.Get(url)
@@ -64,13 +69,12 @@ func getCountryCodes() map[string]bool {
 			log.Fatalf("failed to decode Google country codes: %v", err)
 		}
 
-		// and write to file
+		// write to file
 		output, err := json.MarshalIndent(data, "", "  ")
 		if err != nil {
 			log.Fatalf("failed to marshal country codes: %v", err)
 		}
-		err = os.WriteFile("country_codes.json", output, 0644)
-		if err != nil {
+		if err = os.WriteFile("country_codes.json", output, 0644); err != nil {
 			log.Fatalf("failed to write country codes to json file: %v", err)
 		}
 	} else {
