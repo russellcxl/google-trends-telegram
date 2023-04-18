@@ -10,10 +10,7 @@ import (
 	"strings"
 
 	"github.com/russellcxl/google-trends/pkg/utils"
-
 	"github.com/russellcxl/google-trends/pkg/types"
-
-	"github.com/russellcxl/google-trends/pkg/api"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -22,10 +19,10 @@ var bot *teleBot
 
 type teleBot struct {
 	*tgbotapi.BotAPI
-	gClient *api.GoogleClient
+	gClient types.GoogleClient
 }
 
-func Run(gClient *api.GoogleClient) {
+func Run(gClient types.GoogleClient) {
 
 	// init bot
 	token, found := os.LookupEnv("TELEGRAM_TOKEN")
@@ -110,15 +107,15 @@ func (t teleBot) handleCmd(userID int64, cmd, args string) (string, error) {
 			}
 			return "Welcome to the Google Trends bot!", nil
 		}
-		
+
 	case "getdaily":
-		var opts *api.DailyOpts
+		var opts *types.DailyOpts
 		if len(_args) > 1 {
 			return "Too many arguments for /getdaily. Should only contain 1: {COUNTRY}", nil
 		}
 		if len(_args) > 0 {
 			country := _args[0]
-			opts = &api.DailyOpts{
+			opts = &types.DailyOpts{
 				Country: &country,
 			}
 		}

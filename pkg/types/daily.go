@@ -56,3 +56,7 @@ type Child struct {
 type UserIDs struct {
 	UserIDs []int64 `json:"user_ids"`
 }
+
+type DailyOpts struct {
+	Country *string
+}

@@ -23,10 +23,6 @@ type GoogleClient struct {
 	validCountryCodes map[string]bool
 }
 
-type DailyOpts struct {
-	Country *string
-}
-
 func NewGoogleClient() *GoogleClient {
 	cfg := config.GetConfig()
 	defaultParams := url.Values{}

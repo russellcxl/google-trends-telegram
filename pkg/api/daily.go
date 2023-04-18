@@ -14,7 +14,7 @@ import (
 	"github.com/russellcxl/google-trends/pkg/types"
 )
 
-func (c *GoogleClient) GetDailyTrends(opts *DailyOpts) string {
+func (c *GoogleClient) GetDailyTrends(opts *types.DailyOpts) string {
 	params := cloneParams(c.params)
 	if opts != nil {
 		if opts.Country != nil {
@@ -57,14 +57,19 @@ func (c *GoogleClient) GetDailyTrends(opts *DailyOpts) string {
 
 	var list string
 	listCount := c.config.GoogleClient.Daily.ListCount
+	var fewerThanExpected bool
 	if listCount > len(searches) {
 		listCount = len(searches)
+		fewerThanExpected = true
 	}
 	for i := 0; i < listCount; i++ {
 		s := searches[i]
 		list += fmt.Sprintf("*%s*\n      _~%s searches_\n\n", s.Title.Query, s.FormattedTraffic)
 	}
-	output := fmt.Sprintf("Top %d trending topics in %s today:\n\n%s", listCount, params.Get("geo"), list)
+	output := fmt.Sprintf("\xF0\x9F\x93\xBA Top 7 trending topics in %s today:\n\n%s", params.Get("geo"), list)
+	if fewerThanExpected {
+		output = fmt.Sprintf("%s\n\nOops! Looks like there are only %d topics right now.", output, listCount)
+	}
 	return output
 }
 
