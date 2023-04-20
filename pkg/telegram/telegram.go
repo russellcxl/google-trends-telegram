@@ -3,6 +3,7 @@ package telegram
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/russellcxl/google-trends/pkg/types"
 
@@ -12,10 +13,9 @@ import (
 type teleBot struct {
 	*tgbotapi.BotAPI
 	gClient types.GoogleClient
-	redis   types.RedisClient
 }
 
-func New(gClient types.GoogleClient, redisClient types.RedisClient) *teleBot {
+func New(gClient types.GoogleClient) *teleBot {
 	// init bot
 	token, found := os.LookupEnv("TELEGRAM_TOKEN")
 	if !found {
@@ -28,7 +28,6 @@ func New(gClient types.GoogleClient, redisClient types.RedisClient) *teleBot {
 	return &teleBot{
 		BotAPI:  b,
 		gClient: gClient,
-		redis:   redisClient,
 	}
 }
 
@@ -45,6 +44,11 @@ func (t *teleBot) Run(gClient types.GoogleClient) {
 	// process updates
 	for update := range updates {
 
+		// handle callbacks
+		if update.CallbackQuery != nil {
+			t.handleCallbackQuery(update)
+		}
+
 		// ignore non-message updates
 		if update.Message == nil {
 			continue
@@ -53,8 +57,9 @@ func (t *teleBot) Run(gClient types.GoogleClient) {
 		// send message back to user
 		userID := update.Message.Chat.ID
 		var resp string
+		var keyboard *tgbotapi.InlineKeyboardMarkup
 		if update.Message.IsCommand() {
-			resp, err = t.handleCmd(userID, update.Message.Command(), update.Message.CommandArguments())
+			resp, keyboard, err = t.handleCmd(userID, update.Message.Command(), update.Message.CommandArguments())
 			if err != nil {
 				log.Println(err)
 				resp = "Something went wrong with the bot :("
@@ -62,8 +67,32 @@ func (t *teleBot) Run(gClient types.GoogleClient) {
 		}
 		message := tgbotapi.NewMessage(userID, resp)
 		message.ParseMode = tgbotapi.ModeMarkdown
+		if keyboard != nil {
+			message.ReplyMarkup = *keyboard
+		}
 		if _, err = t.Send(message); err != nil {
 			log.Printf("failed to send message back to user (%d): %v", userID, err)
 		}
+
 	}
+}
+
+func (t *teleBot) handleCmd(userID int64, cmd, args string) (string, *tgbotapi.InlineKeyboardMarkup, error) {
+	var _args []string
+	if args != "" {
+		_args = strings.Split(args, " ")
+	}
+
+	// check if user is authorized
+	if cmd != "start" && !isUserAllowed(userID) {
+		return "You're not authorized", nil, nil
+	}
+
+	switch cmd {
+	case "start":
+		return t.handleStart(userID, cmd, _args)
+	case "getdaily":
+		return t.handleDaily(userID, cmd, _args)
+	}
+	return "Whoops! You've entered an invalid command.", nil, nil
 }

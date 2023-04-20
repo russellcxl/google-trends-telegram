@@ -3,6 +3,8 @@ package types
 const (
 	BaseURL              = "https://trends.google.com/trends/api"
 	DailyTrendsURLPrefix = "/dailytrends"
+	DailyCallbackPrefix  = "daily"
+	DailyRedisKey        = "daily"
 )
 
 type Daily struct {
@@ -19,12 +21,11 @@ type TrendingSearchDays struct {
 }
 
 type TrendingSearch struct {
-	Title            SearchTitle      `json:"title"`
-	FormattedTraffic string           `json:"formattedTraffic"`
-	Image            SearchImage      `json:"image"`
-	Articles         []*SearchArticle `json:"articles"`
+	Title            SearchTitle     `json:"title"`
+	FormattedTraffic string          `json:"formattedTraffic"`
+	Image            SearchImage     `json:"image"`
+	Articles         []SearchArticle `json:"articles"`
 }
-
 
 type SearchTitle struct {
 	Query string `json:"query"`
@@ -37,12 +38,12 @@ type SearchImage struct {
 }
 
 type SearchArticle struct {
-	Title   string       `json:"title"`
-	TimeAgo string       `json:"timeAgo"`
-	Source  string       `json:"source"`
-	Image   *SearchImage `json:"image"`
-	URL     string       `json:"url"`
-	Snippet string       `json:"snippet"`
+	Title   string      `json:"title"`
+	TimeAgo string      `json:"timeAgo"`
+	Source  string      `json:"source"`
+	Image   SearchImage `json:"image"`
+	URL     string      `json:"url"`
+	Snippet string      `json:"snippet"`
 }
 
 type CountryCodes struct {

@@ -31,10 +31,10 @@ func main() {
 	}()
 
 	// init clients
-	gClient := api.NewGoogleClient()
-	rClient := session.New("addr string", "", 0)
+	rClient := session.New("localhost:6379", "", 0)
+	gClient := api.NewGoogleClient(rClient)
 
 	// allows program to start receiving messages from the telegram bot
-	teleBot := telegram.New(gClient, rClient)
+	teleBot := telegram.New(gClient)
 	teleBot.Run(gClient)
 }

@@ -28,6 +28,10 @@ func (c *Redis) GetValue(key string) (string, error) {
 	return c.client.Get(key).Result()
 }
 
+func (c *Redis) KeyExists(key string) (int64, error) {
+	return c.client.Exists(key).Result()
+}
+
 func (c *Redis) DeleteValue(key string) error {
 	return c.client.Del(key).Err()
 }

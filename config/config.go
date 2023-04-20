@@ -19,7 +19,8 @@ type GoogleClient struct {
 }
 
 type Daily struct {
-	ListCount int `yaml:"list_count"`
+	ListCount              int `yaml:"list_count"`
+	RefreshIntervalMinutes int `yaml:"refresh_interval_mins"`
 }
 
 func GetConfig() *Config {

@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/russellcxl/google-trends/pkg/utils"
 	"encoding/json"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+
+	"github.com/russellcxl/google-trends/pkg/utils"
 
 	"github.com/russellcxl/google-trends/config"
 
@@ -21,9 +22,10 @@ type GoogleClient struct {
 	params            url.Values
 	config            *config.Config
 	validCountryCodes map[string]bool
+	redis             types.RedisClient
 }
 
-func NewGoogleClient() *GoogleClient {
+func NewGoogleClient(r types.RedisClient) *GoogleClient {
 	cfg := config.GetConfig()
 	defaultParams := url.Values{}
 	for _, val := range cfg.GoogleClient.DefaultParams {
@@ -34,6 +36,7 @@ func NewGoogleClient() *GoogleClient {
 		params:            defaultParams,
 		config:            cfg,
 		validCountryCodes: getCountryCodes(),
+		redis:             r,
 	}
 }
 
@@ -44,7 +47,7 @@ func getCountryCodes() map[string]bool {
 
 	// if not found locally, get from URL and save it
 	if err := utils.ReadJSONFile(path, &data); err != nil {
-		
+
 		// get from URL
 		log.Println("Country codes not found. Getting from URL")
 		url := "https://assets.api-cdn.com/serpwow/serpwow_google_trends_geos.json"
