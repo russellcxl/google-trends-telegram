@@ -25,6 +25,7 @@ type TrendingSearch struct {
 	Articles         []*SearchArticle `json:"articles"`
 }
 
+
 type SearchTitle struct {
 	Query string `json:"query"`
 }

@@ -30,7 +30,6 @@ func New(gClient types.GoogleClient, redisClient types.RedisClient) *teleBot {
 		gClient: gClient,
 		redis:   redisClient,
 	}
-
 }
 
 func (t *teleBot) Run(gClient types.GoogleClient) {

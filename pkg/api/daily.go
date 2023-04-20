@@ -64,11 +64,11 @@ func (c *GoogleClient) GetDailyTrends(opts *types.DailyOpts) string {
 	}
 	for i := 0; i < listCount; i++ {
 		s := searches[i]
-		list += fmt.Sprintf("*%s*\n      _~%s searches_\n\n", s.Title.Query, s.FormattedTraffic)
+		list += fmt.Sprintf("%s *%s*\n      _~%s searches_\n\n", intToDigitUnicode(i+1), s.Title.Query, s.FormattedTraffic)
 	}
-	output := fmt.Sprintf("\xF0\x9F\x93\xBA Top 7 trending topics in %s today:\n\n%s", params.Get("geo"), list)
+	output := fmt.Sprintf("Top 7 trending topics in %s today:\n\n%s\n", params.Get("geo"), list)
 	if fewerThanExpected {
-		output = fmt.Sprintf("%s\n\nOops! Looks like there are only %d topics right now.", output, listCount)
+		output = fmt.Sprintf("%s\n\n_Oops! Looks like there are only %d topics right now._", output, listCount)
 	}
 	return output
 }
@@ -79,4 +79,8 @@ func cloneParams(params url.Values) url.Values {
 		m[k] = v
 	}
 	return m
+}
+
+func intToDigitUnicode(n int) string {
+	return utils.DigitUnicodesMap[n]
 }
