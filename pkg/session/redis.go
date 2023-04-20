@@ -39,3 +39,7 @@ func (c *Redis) AddToList(key string, value string) error {
 func (c *Redis) GetList(key string) ([]string, error) {
 	return c.client.LRange(key, 0, -1).Result()
 }
+
+func (c *Redis) ExpireKey(key string, expiry time.Duration) error {
+	return c.client.Expire(key, expiry).Err()
+}
