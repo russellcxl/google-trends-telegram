@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"regexp"
 	"encoding/json"
 	"os"
 	"time"
@@ -57,4 +58,15 @@ func WriteJSONFile(filename string, data interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func RemoveTLD(s string) string {
+	tldPattern := `\.(com|net|org|edu|gov|mil|co|io|me|us)$`
+
+    regex, err := regexp.Compile(tldPattern)
+    if err != nil {
+        panic(err)
+    }
+
+    return regex.ReplaceAllString(s, "")
 }

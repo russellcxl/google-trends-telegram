@@ -1,6 +1,7 @@
 package api
 
 import (
+	"html"
 	"context"
 	"fmt"
 	"io"
@@ -76,8 +77,12 @@ func (c *GoogleClient) GetDailyTrendsTopic(country string, idx int) string {
 		return err.Error()
 	}
 	topic := out.Default.Searches[0].Searches[idx]
-	return fmt.Sprintf("*%s*\n\n%s", topic.Title.Query, topic.Image.NewsURL)
-
+	var list string
+	for i, a := range topic.Articles {
+		source := utils.RemoveTLD(a.Source)
+		list += fmt.Sprintf("%s [%s](%s) -- %s\n\n", utils.DigitUnicodesMap[i+1], html.UnescapeString(a.Snippet), a.URL, source)
+	}
+	return fmt.Sprintf("*%s* (_%s searches_)\n\n%s", topic.Title.Query, topic.FormattedTraffic, list)
 }
 
 func (c *GoogleClient) getDaily(country string) (*types.Daily, error) {

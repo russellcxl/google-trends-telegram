@@ -14,7 +14,7 @@ func (t *teleBot) handleCallbackQuery(update tgbotapi.Update) {
 		fmt.Println(update.CallbackQuery.Data)
 		arr := strings.Split(update.CallbackQuery.Data, "_")
 		prefix := arr[0]
-		output := "test"
+		output := "I'm afraid don't know how to respond to that"
 		
 		switch prefix {
 		case types.DailyCallbackPrefix:
