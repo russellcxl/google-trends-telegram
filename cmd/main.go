@@ -31,7 +31,10 @@ func main() {
 	}()
 
 	// init clients
-	rClient := session.New(os.Getenv("REDIS_ADDRESS"), os.Getenv("REDIS_PASSWORD"), 0)
+	rClient, err := session.New(os.Getenv("REDIS_ADDRESS"), os.Getenv("REDIS_PASSWORD"), 0)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	gClient := api.NewGoogleClient(rClient)
 
 	// allows program to start receiving messages from the telegram bot

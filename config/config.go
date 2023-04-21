@@ -11,6 +11,7 @@ var config *Config
 
 type Config struct {
 	GoogleClient GoogleClient `yaml:"google_client"`
+	Redis        Redis        `yaml:"redis"`
 }
 
 type GoogleClient struct {
@@ -21,6 +22,10 @@ type GoogleClient struct {
 type Daily struct {
 	ListCount              int `yaml:"list_count"`
 	RefreshIntervalMinutes int `yaml:"refresh_interval_mins"`
+}
+
+type Redis struct {
+	RetryCount int `yaml:"retry_count"`
 }
 
 func GetConfig() *Config {

@@ -2,20 +2,19 @@ package telegram
 
 import (
 	"strconv"
-	"github.com/russellcxl/google-trends/pkg/types"
 	"strings"
-	"fmt"
+
+	"github.com/russellcxl/google-trends/pkg/types"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func (t *teleBot) handleCallbackQuery(update tgbotapi.Update) {
 	if update.CallbackQuery != nil {
-		fmt.Println(update.CallbackQuery.Data)
 		arr := strings.Split(update.CallbackQuery.Data, "_")
 		prefix := arr[0]
 		output := "I'm afraid don't know how to respond to that"
-		
+
 		switch prefix {
 		case types.DailyCallbackPrefix:
 			country := arr[1]

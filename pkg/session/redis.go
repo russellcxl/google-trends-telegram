@@ -1,7 +1,11 @@
 package session
 
 import (
+	"fmt"
+	"log"
 	"time"
+
+	"github.com/russellcxl/google-trends/config"
 
 	"github.com/go-redis/redis"
 )
@@ -10,14 +14,29 @@ type Redis struct {
 	client *redis.Client
 }
 
-func New(addr, password string, dbIndex int) *Redis {
-	return &Redis{
-		client: redis.NewClient(&redis.Options{
+// Tries to connect to redis and returns a client if successful
+func New(addr, password string, dbIndex int) (*Redis, error) {
+	cfg := config.GetConfig()
+	retryCount := cfg.Redis.RetryCount
+	var client *redis.Client
+	var err error
+	for i := 0; i < retryCount; i++ {
+		client = redis.NewClient(&redis.Options{
 			Addr:     addr,
 			Password: password,
 			DB:       dbIndex,
-		}),
+		})
+		_, err = client.Ping().Result()
+		if err == nil {
+			log.Println("Connected to Redis!")
+			return &Redis{
+				client: client,
+			}, nil
+		}
+		log.Printf("Error connecting to Redis (%v): %v\n", i+1, err)
+		time.Sleep(5 * time.Second)
 	}
+	return nil, fmt.Errorf("failed to connect to redis after %d retries: %v", retryCount, err)
 }
 
 func (c *Redis) SetValue(key, value string, expiry time.Duration) error {

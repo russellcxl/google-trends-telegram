@@ -7,3 +7,5 @@ google_client:
   daily:
     list_count: 7
     refresh_interval_mins: 30
+redis:
+  retry_count: 10

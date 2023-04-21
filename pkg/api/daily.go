@@ -16,6 +16,7 @@ import (
 	"github.com/russellcxl/google-trends/pkg/types"
 )
 
+// GetDailyTrends returns a list of the top trending topics
 func (c *GoogleClient) GetDailyTrends(opts *types.DailyOpts) (text string, keyboard [][]string) {
 
 	// validate opts
