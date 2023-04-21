@@ -77,6 +77,7 @@ func (t *teleBot) Run(gClient types.GoogleClient) {
 	}
 }
 
+// routes the cmd to the correct handler
 func (t *teleBot) handleCmd(userID int64, cmd, args string) (string, *tgbotapi.InlineKeyboardMarkup, error) {
 	var _args []string
 	if args != "" {

@@ -70,6 +70,8 @@ func (c *GoogleClient) GetDailyTrends(opts *types.DailyOpts) (text string, keybo
 	return
 }
 
+
+// GetDailyTrendsTopic returns a list of articles for a trending topic
 func (c *GoogleClient) GetDailyTrendsTopic(country string, idx int) string {
 	// get daily trending topics from cache / url
 	out, err := c.getDaily(country)
@@ -80,7 +82,7 @@ func (c *GoogleClient) GetDailyTrendsTopic(country string, idx int) string {
 	var list string
 	for i, a := range topic.Articles {
 		source := utils.RemoveTLD(a.Source)
-		list += fmt.Sprintf("%s [%s](%s) -- %s\n\n", utils.DigitUnicodesMap[i+1], html.UnescapeString(a.Snippet), a.URL, source)
+		list += fmt.Sprintf("%s [%s](%s)\n -- %s\n\n", utils.DigitUnicodesMap[i+1], html.UnescapeString(a.Snippet), a.URL, source)
 	}
 	return fmt.Sprintf("*%s* (_%s searches_)\n\n%s", topic.Title.Query, topic.FormattedTraffic, list)
 }
