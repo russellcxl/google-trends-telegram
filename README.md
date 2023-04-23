@@ -1,20 +1,22 @@
-# Google Trends API
+# Google Trends API + Telegram bot + Redis
 
-## Task
-Convert https://trends.google.com/trends/trendingsearches/daily?geo=SG, into an API Web Service that can be called to send a report of the top 7 trending topics sorted from highest to lowest via a Telegram Chatbot.
+## Features
+- Telegram bot that returns a list of daily trending topics from Google Trends when a user calls the command `/getdaily`
+- Users can click on any number corresponding to a topic to get a list of related top articles (see screenshots below)
+- Access control -- `t.me/RussellGTrendBot?start=123`. Tokens are stored in .env as MD5 hashes
+- Trending topics are stored in Redis temporarily for reduced querying
 
-- Level 1: Just an API web service call, with or without a return response. Ability to data mine & use of parsers.
-- Level 2: API with version control, token access control, Telegram Chat Menu
-- Level 3: Clear documentation, structure, design at code and service design with UXD - Developer.
-- Level 4: Recommend 3 different development stacks, cloud computing services and their trade-offs. 
-- Level 5: Business Understanding and Opportunities. Ability to create monetization, cost reduction or cost avoidance strategies.
 
-## Running
+## Usage
+1. Build the images
 ```
-docker build -t trends .
-
-docker run 
--e TELEGRAM_TOKEN=XXX 
--e ACCESS_TOKEN=XXX 
--it trends
+docker compose build
 ```
+2. Run the containers
+```
+docker compose up
+```
+
+## Screenshots
+![get_daily_trending_topics](/images/get_daily.png)
+![get_daily_trending_topic](/images/get_topic.png)
