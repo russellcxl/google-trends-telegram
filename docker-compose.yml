@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  cache:
+    image: redis:alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1
+    volumes:
+      - cache:/data
+  app:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=cache
+      - CONFIG_PATH=/app/config/config.yaml
+      - DATA_PATH=/app/data
+    depends_on:
+      - cache
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config  
+volumes:
+  cache:

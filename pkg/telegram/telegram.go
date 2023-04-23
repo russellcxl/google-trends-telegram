@@ -31,7 +31,7 @@ func New(gClient types.GoogleClient) *teleBot {
 	}
 }
 
-func (t *teleBot) Run(gClient types.GoogleClient) {
+func (t *teleBot) Run() {
 
 	// create channel to receive message from bot
 	updateConfig := tgbotapi.NewUpdate(0)

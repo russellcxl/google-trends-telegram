@@ -19,8 +19,4 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 
 COPY --from=builder /app/trends /app/trends
 
-COPY /config/config.yaml ./app
-ENV CONFIG_PATH="$WORKDIR/config.yaml"
-ENV DATA_PATH="$WORKDIR/data"
-
 CMD ["/app/trends"]

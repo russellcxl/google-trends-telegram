@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -17,10 +18,7 @@ import (
 func main() {
 
 	// load env variables
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Printf("failed to load local .env file: %v", err)
-	}
+	godotenv.Load(".env")
 
 	// terminate gracefully
 	c := make(chan os.Signal, 2)
@@ -31,13 +29,14 @@ func main() {
 	}()
 
 	// init clients
-	rClient, err := session.New(os.Getenv("REDIS_ADDRESS"), os.Getenv("REDIS_PASSWORD"), 0)
+	redisAddr := fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+	redisClient, err := session.New(redisAddr, os.Getenv("REDIS_PASSWORD"), 0)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	gClient := api.NewGoogleClient(rClient)
+	googleClient := api.NewGoogleClient(redisClient)
 
 	// allows program to start receiving messages from the telegram bot
-	teleBot := telegram.New(gClient)
-	teleBot.Run(gClient)
+	teleBot := telegram.New(googleClient)
+	teleBot.Run()
 }
